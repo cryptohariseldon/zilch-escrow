@@ -17,6 +17,8 @@ pub mod anchor_escrow {
         random_seed: u64,
         initializer_amount: u64,
         taker_amount: u64,
+        program_hash: Pubkey,
+        public_inputs_account: Pubkey,
     ) -> Result<()> {
         ctx.accounts.escrow_state.initializer_key = *ctx.accounts.initializer.key;
         ctx.accounts.escrow_state.initializer_deposit_token_account = *ctx
@@ -32,7 +34,8 @@ pub mod anchor_escrow {
         ctx.accounts.escrow_state.initializer_amount = initializer_amount;
         ctx.accounts.escrow_state.taker_amount = 0;
         ctx.accounts.escrow_state.random_seed = random_seed;
-        ctx.accounts.escrow_state.inputs_account = inputs_account;
+        ctx.accounts.escrow_state.program_hash_account = program_hash;
+        ctx.accounts.escrow_state.public_inputs_account = public_inputs_account;
 
 
         let (vault_authority, _vault_authority_bump) =
@@ -73,13 +76,15 @@ pub mod anchor_escrow {
         Ok(())
     }
 
-    pub fn exchange(ctx: Context<Exchange>) -> Result<()> {
+    pub fn exchange(ctx: Context<Exchange>, proof_account: Pubkey, outputs_account: Pubkey) -> Result<()> {
         let (_vault_authority, vault_authority_bump) =
             Pubkey::find_program_address(&[AUTHORITY_SEED], ctx.program_id);
         let authority_seeds = &[&AUTHORITY_SEED[..], &[vault_authority_bump]];
 
-        ctx.accounts.escrow_state.random_seed = proof_address;
-        ctx.accounts.escrow_state.outputs_address = proof_address;
+        // ctx.accounts.escrow_state.random_seed = proof_account;
+        ctx.accounts.escrow_state.outputs_account = outputs_account;
+        ctx.accounts.escrow_state.proof_account = proof_account;
+
 
         // tokens are optimistically transferred on submitting proofs.
         // A delay period or other dispute resolution mechanism may be added at this stage.
@@ -135,8 +140,10 @@ pub struct Initialize<'info> {
     pub rent: Sysvar<'info, Rent>,
     /// CHECK: This is not dangerous because we don't read or write from this account
     pub token_program: Program<'info, Token>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
     pub program_hash: AccountInfo<'info>,
-    pub inputs_account: AccountInfo<'info>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    pub public_inputs_account: AccountInfo<'info>,
 }
 
 #[derive(Accounts)]
@@ -192,7 +199,9 @@ pub struct Exchange<'info> {
     /// CHECK: This is not dangerous because we don't read or write from this account
     pub token_program: Program<'info, Token>,
     //Zilch prover commits output and proof to escrow program.
+    /// CHECK: This is not dangerous because we don't read or write from this account
     pub outputs_account: AccountInfo<'info>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
     pub proof_account: AccountInfo<'info>,
 }
 
