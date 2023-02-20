@@ -1,4 +1,16 @@
-# Anchor Example: Escrow Program
+# Zilch Example Computational Escrow Program
+
+This program keeps track of computational requests, and proofs submitted on the Zilch ZK-rollup system. It is also responsible for issuing rewards to Providers that submit correct proofs and outputs for the requested computation.
+
+The Zilch-escrow contract is deployed on devnet:
+3LLSGFJHcYJA4mawtw9zW3N1tfzSMPYHycJi984SEJ7T
+
+
+
+## Testing
+
+
+
 
 > See this [doc](https://book.solmeet.dev/notes/intro-to-anchor) for more implementation details
 
@@ -12,7 +24,7 @@ However, there is one major difference between this exmaple and the original Esc
 
 ![](https://hackmd.io/_uploads/Hkn1gdtuj.png)
 
-`Initializer` can send a transaction to the escrow program to initialize the Vault. In this transaction, two new accounts: `Vault` and `EscrowState`, will be created and tokens (Token A) to be exchanged will be transfered from `Initializer` to `Vault`.
+`Initializer` can send a transaction to the escrow program to initialize the Vault. In this transaction, two new accounts: `Vault` and `EscrowState`, will be created and tokens (Token A) to be exchanged will be transfered from `Initializer` to `Vault`. The Initialiser also stores the program hash, and the public inputs in accounts and saves those accounts into the escrow struct.
 
 #### Cancel
 
@@ -24,7 +36,7 @@ However, there is one major difference between this exmaple and the original Esc
 
 ![](https://hackmd.io/_uploads/HkhNE_tdi.png)
 
-`Taker` can send a transaction to the escrow to exchange Token B for Token A. First, tokens (Token B) will be transfered from `Taker` to `Initializer`. Afterward, the tokens (Token A) kept in the Vault will be transfered to `Taker`. Finally, both `Vault` and `EscrowState` will be closed.
+First, the proof and outputs registered by the provider (Taker) will be committed on chain. Afterward, the tokens (Token A) kept in the Vault will be transfered to `Taker` as a reward. Finally, both `Vault` and `EscrowState` will be closed.
 
 ## Install, Build, Deploy and Test
 
