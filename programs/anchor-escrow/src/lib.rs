@@ -4,7 +4,7 @@ use anchor_spl::token::{
     TokenAccount, Transfer,
 };
 
-declare_id!("GW65RiuuG2zU27S39FW83Yug1t13RxWWwHSCWRwSaybC");
+declare_id!("3LLSGFJHcYJA4mawtw9zW3N1tfzSMPYHycJi984SEJ7T");
 
 #[program]
 pub mod anchor_escrow {
@@ -30,8 +30,10 @@ pub mod anchor_escrow {
             .to_account_info()
             .key;
         ctx.accounts.escrow_state.initializer_amount = initializer_amount;
-        ctx.accounts.escrow_state.taker_amount = taker_amount;
+        ctx.accounts.escrow_state.taker_amount = 0;
         ctx.accounts.escrow_state.random_seed = random_seed;
+        ctx.accounts.escrow_state.inputs_account = inputs_account;
+
 
         let (vault_authority, _vault_authority_bump) =
             Pubkey::find_program_address(&[AUTHORITY_SEED], ctx.program_id);
@@ -76,11 +78,11 @@ pub mod anchor_escrow {
             Pubkey::find_program_address(&[AUTHORITY_SEED], ctx.program_id);
         let authority_seeds = &[&AUTHORITY_SEED[..], &[vault_authority_bump]];
 
-        token::transfer(
-            ctx.accounts.into_transfer_to_initializer_context(),
-            ctx.accounts.escrow_state.taker_amount,
-        )?;
+        ctx.accounts.escrow_state.random_seed = proof_address;
+        ctx.accounts.escrow_state.outputs_address = proof_address;
 
+        // tokens are optimistically transferred on submitting proofs.
+        // A delay period or other dispute resolution mechanism may be added at this stage.
         token::transfer(
             ctx.accounts
                 .into_transfer_to_taker_context()
@@ -133,6 +135,8 @@ pub struct Initialize<'info> {
     pub rent: Sysvar<'info, Rent>,
     /// CHECK: This is not dangerous because we don't read or write from this account
     pub token_program: Program<'info, Token>,
+    pub program_hash: AccountInfo<'info>,
+    pub inputs_account: AccountInfo<'info>,
 }
 
 #[derive(Accounts)]
@@ -187,6 +191,9 @@ pub struct Exchange<'info> {
     pub vault_authority: AccountInfo<'info>,
     /// CHECK: This is not dangerous because we don't read or write from this account
     pub token_program: Program<'info, Token>,
+    //Zilch prover commits output and proof to escrow program.
+    pub outputs_account: AccountInfo<'info>,
+    pub proof_account: AccountInfo<'info>,
 }
 
 #[account]
@@ -197,6 +204,10 @@ pub struct EscrowState {
     pub initializer_receive_token_account: Pubkey,
     pub initializer_amount: u64,
     pub taker_amount: u64,
+    pub program_hash_account: Pubkey,
+    pub public_inputs_account: Pubkey,
+    pub outputs_account: Pubkey,
+    pub proof_account: Pubkey,
 }
 
 impl EscrowState {
