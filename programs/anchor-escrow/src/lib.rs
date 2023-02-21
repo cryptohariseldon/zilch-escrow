@@ -1,8 +1,13 @@
 use anchor_lang::prelude::*;
+//use anchor_lang::AnchorDeserialize;
 use anchor_spl::token::{
     self, spl_token::instruction::AuthorityType, CloseAccount, Mint, SetAuthority, Token,
     TokenAccount, Transfer,
 };
+//use miden_core::{utils::collections::Vec, ProgramOutputs};
+//use borsh::{BorshDeserialize, BorshSerialize};
+
+
 
 declare_id!("3LLSGFJHcYJA4mawtw9zW3N1tfzSMPYHycJi984SEJ7T");
 
@@ -17,8 +22,8 @@ pub mod anchor_escrow {
         random_seed: u64,
         initializer_amount: u64,
         taker_amount: u64,
-        program_hash: Pubkey,
-        public_inputs_account: Pubkey,
+        program_hash: String,
+        public_inputs: Box<[u64]>,
     ) -> Result<()> {
         ctx.accounts.escrow_state.initializer_key = *ctx.accounts.initializer.key;
         ctx.accounts.escrow_state.initializer_deposit_token_account = *ctx
@@ -34,8 +39,9 @@ pub mod anchor_escrow {
         ctx.accounts.escrow_state.initializer_amount = initializer_amount;
         ctx.accounts.escrow_state.taker_amount = 0;
         ctx.accounts.escrow_state.random_seed = random_seed;
-        ctx.accounts.escrow_state.program_hash_account = program_hash;
-        ctx.accounts.escrow_state.public_inputs_account = public_inputs_account;
+        ctx.accounts.escrow_state.program_hash = program_hash;
+        //let inputs: &[u64] = &[1, 1];
+        ctx.accounts.escrow_state.public_inputs = public_inputs;
 
 
         let (vault_authority, _vault_authority_bump) =
@@ -76,16 +82,17 @@ pub mod anchor_escrow {
         Ok(())
     }
 
-    pub fn exchange(ctx: Context<Exchange>, proof_account: Pubkey, outputs_account: Pubkey) -> Result<()> {
+    pub fn exchange(ctx: Context<Exchange>, proof_account: Pubkey, outputs_stack: Box<[u64]>, outputs_oflow: Box<[u64]>) -> Result<()> {
         let (_vault_authority, vault_authority_bump) =
             Pubkey::find_program_address(&[AUTHORITY_SEED], ctx.program_id);
         let authority_seeds = &[&AUTHORITY_SEED[..], &[vault_authority_bump]];
 
         // ctx.accounts.escrow_state.random_seed = proof_account;
-        ctx.accounts.escrow_state.outputs_account = outputs_account;
+        //ctx.accounts.escrow_state.outputs = outputs_account;
         ctx.accounts.escrow_state.proof_account = proof_account;
 
-
+        let outputs: Box<[u64]> = outputs_stack;
+        ctx.accounts.escrow_state.outputs = outputs;
         // tokens are optimistically transferred on submitting proofs.
         // A delay period or other dispute resolution mechanism may be added at this stage.
         token::transfer(
@@ -140,10 +147,6 @@ pub struct Initialize<'info> {
     pub rent: Sysvar<'info, Rent>,
     /// CHECK: This is not dangerous because we don't read or write from this account
     pub token_program: Program<'info, Token>,
-    /// CHECK: This is not dangerous because we don't read or write from this account
-    pub program_hash: AccountInfo<'info>,
-    /// CHECK: This is not dangerous because we don't read or write from this account
-    pub public_inputs_account: AccountInfo<'info>,
 }
 
 #[derive(Accounts)]
@@ -213,9 +216,9 @@ pub struct EscrowState {
     pub initializer_receive_token_account: Pubkey,
     pub initializer_amount: u64,
     pub taker_amount: u64,
-    pub program_hash_account: Pubkey,
-    pub public_inputs_account: Pubkey,
-    pub outputs_account: Pubkey,
+    pub program_hash: String,
+    pub public_inputs: Box<[u64]>,
+    pub outputs: Box<[u64]>,
     pub proof_account: Pubkey,
 }
 

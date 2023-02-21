@@ -20,7 +20,7 @@ describe("anchor-escrow", () => {
 
   // CAUTTION: if you are intended to use the program that is deployed by yourself,
   // please make sure that the programIDs are consistent
-  const programId = new PublicKey("GW65RiuuG2zU27S39FW83Yug1t13RxWWwHSCWRwSaybC");
+  const programId = new PublicKey("3LLSGFJHcYJA4mawtw9zW3N1tfzSMPYHycJi984SEJ7T");
   const program = new anchor.Program(IDL, programId, provider);
 
   let mintA = null as PublicKey;
@@ -30,10 +30,12 @@ describe("anchor-escrow", () => {
   let takerTokenAccountA = null as PublicKey;
   let takerTokenAccountB = null as PublicKey;
 
-  const takerAmount = 1000;
+  const takerAmount = 0;
   const initializerAmount = 500;
 
   // Main Roles
+  const inputs = '{"stack_init": ["1", "1"]}';
+  const program_hash = "c8653f31a1098e1b83c5d4972ec544cac00aa784bba18b5a9db7478977d38e68";
   const payer = anchor.web3.Keypair.generate();
   const mintAuthority = anchor.web3.Keypair.generate();
   const initializer = anchor.web3.Keypair.generate();
@@ -89,6 +91,7 @@ describe("anchor-escrow", () => {
         lamports: 100000000,
       })
     );
+    console.log("transfer commencing")
 
     await provider.sendAndConfirm(fundingTx, [payer]);
 
@@ -115,7 +118,7 @@ describe("anchor-escrow", () => {
 
   it("Initialize escrow", async () => {
     await program.methods
-      .initialize(randomSeed, new anchor.BN(initializerAmount), new anchor.BN(takerAmount))
+      .initialize(randomSeed, new anchor.BN(initializerAmount), new anchor.BN(takerAmount), program_hash, inputs)
       .accounts({
         initializer: initializer.publicKey,
         vault: vaultKey,

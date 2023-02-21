@@ -17,3 +17,6 @@ no-idl = []
 [dependencies]
 anchor-lang = "0.26.0"
 anchor-spl = "0.26.0"
+borsh = "0.10.2"
+miden = "0.3.0"
+miden-core = "0.3.0"
