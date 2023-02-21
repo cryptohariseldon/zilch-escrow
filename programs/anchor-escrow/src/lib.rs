@@ -12,6 +12,12 @@ use anchor_spl::token::{
 //declare_id!("3LLSGFJHcYJA4mawtw9zW3N1tfzSMPYHycJi984SEJ7T");
 declare_id!("42E6CXWWv9nRj52y6fVEtzDvTQGg7BTHK45DAQvCNW2f");
 
+#[derive(AnchorSerialize, AnchorDeserialize)]
+pub struct ComputeRequest {
+    pub public_inputs: Vec<u64>,
+    pub program_hash: String,
+}
+
 #[program]
 pub mod anchor_escrow {
     use super::*;
@@ -23,8 +29,7 @@ pub mod anchor_escrow {
         random_seed: u64,
         initializer_amount: u64,
         taker_amount: u64,
-        program_hash: String,
-        public_inputs: String,
+        computerequest: ComputeRequest,
     ) -> Result<()> {
         ctx.accounts.escrow_state.initializer_key = *ctx.accounts.initializer.key;
         ctx.accounts.escrow_state.initializer_deposit_token_account = *ctx
@@ -42,7 +47,8 @@ pub mod anchor_escrow {
         ctx.accounts.escrow_state.random_seed = random_seed;
         ctx.accounts.escrow_state.program_hash = program_hash;
         //let inputs: &[u64] = &[1, 1];
-        ctx.accounts.escrow_state.public_inputs = public_inputs;
+        //ctx.accounts.escrow_state.public_inputs = public_inputs;
+        ctx.accounts.escrow_state.computerequest = computerequest;
 
 
         let (vault_authority, _vault_authority_bump) =
@@ -217,10 +223,7 @@ pub struct EscrowState {
     pub initializer_receive_token_account: Pubkey,
     pub initializer_amount: u64,
     pub taker_amount: u64,
-    pub program_hash: String,
-    pub public_inputs: String,
-    //pub public_inputs: Box<[u64]>,
-    //pub outputs: Box<[u64]>,
+    pub computerequest: ComputeRequest,
     pub proof_account: Pubkey,
 }
 

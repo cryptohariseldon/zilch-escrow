@@ -121,8 +121,22 @@ describe("anchor-escrow", () => {
   it("Initialize escrow", async () => {
     const program_hash = "c8653f31a1098e1b83c5d4972ec544cac00aa784bba18b5a9db7478977d38e68";
     const inputs = "[1,1]";
+    const computeRequest = new anchor.web3.Account();
+    const data = {
+      public_inputs: [1, 1],
+      program_hash: "c8653f31a1098e1b83c5d4972ec544cac00aa784bba18b5a9db7478977d38e68",
+    };
+    const encoded = anchor.utils.bytes.utf8.encode(JSON.stringify(data));
+    computeRequest.data = Buffer.from(encoded);
+    const ComputeRequest = {
+        public_inputs: [1,1],
+        program_hash: "c8653f31a1098e1b83c5d4972ec544cac00aa784bba18b5a9db7478977d38e68",
+    };
+    //const myInstructionBuffer = ComputeRequest.serialize();
+    console.log(initializer.publicKey);
+    const initializerKeypair = anchor.web3.Keypair.fromSecretKey(initializer.secretKey);
     await program.methods
-      .initialize(randomSeed, new anchor.BN(initializerAmount), new anchor.BN(takerAmount), program_hash, inputs)
+      .initialize(randomSeed, new anchor.BN(initializerAmount), new anchor.BN(takerAmount), ComputeRequest)
       .accounts({
         initializer: initializer.publicKey,
         vault: vaultKey,
@@ -132,9 +146,9 @@ describe("anchor-escrow", () => {
         escrowState: escrowStateKey,
         systemProgram: anchor.web3.SystemProgram.programId,
         rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-        tokenProgram: TOKEN_PROGRAM_ID
+        tokenProgram: TOKEN_PROGRAM_ID,
       })
-      .signers([initializer])
+      .signers([initializerKeypair])
       .rpc();
 
     let fetchedVault = await getAccount(connection, vaultKey);
