@@ -37,6 +37,7 @@ describe("anchor-escrow", () => {
   const payer = anchor.web3.Keypair.generate();
   const mintAuthority = anchor.web3.Keypair.generate();
   const initializer = anchor.web3.Keypair.generate();
+  console.log(initializer.publicKey);
   const taker = anchor.web3.Keypair.generate();
 
   // Determined Seeds
@@ -114,7 +115,12 @@ describe("anchor-escrow", () => {
     assert.ok(Number(fetchedTakerTokenAccountB.amount) == takerAmount);
   });
 
+    const proofaddr = "";
+    console.log(initializer.publicKey);
+
   it("Initialize escrow", async () => {
+    const program_hash = "c8653f31a1098e1b83c5d4972ec544cac00aa784bba18b5a9db7478977d38e68";
+    const inputs = "[1,1]";
     await program.methods
       .initialize(randomSeed, new anchor.BN(initializerAmount), new anchor.BN(takerAmount), program_hash, inputs)
       .accounts({
@@ -126,7 +132,7 @@ describe("anchor-escrow", () => {
         escrowState: escrowStateKey,
         systemProgram: anchor.web3.SystemProgram.programId,
         rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-        tokenProgram: TOKEN_PROGRAM_ID,
+        tokenProgram: TOKEN_PROGRAM_ID
       })
       .signers([initializer])
       .rpc();
