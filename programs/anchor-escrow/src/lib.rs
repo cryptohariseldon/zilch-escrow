@@ -12,7 +12,7 @@ use anchor_spl::token::{
 //declare_id!("3LLSGFJHcYJA4mawtw9zW3N1tfzSMPYHycJi984SEJ7T");
 declare_id!("42E6CXWWv9nRj52y6fVEtzDvTQGg7BTHK45DAQvCNW2f");
 
-#[derive(AnchorSerialize, AnchorDeserialize)]
+#[derive(Clone, AnchorSerialize, AnchorDeserialize)]
 pub struct ComputeRequest {
     pub public_inputs: Vec<u64>,
     pub program_hash: String,
@@ -45,7 +45,7 @@ pub mod anchor_escrow {
         ctx.accounts.escrow_state.initializer_amount = initializer_amount;
         ctx.accounts.escrow_state.taker_amount = 0;
         ctx.accounts.escrow_state.random_seed = random_seed;
-        ctx.accounts.escrow_state.program_hash = program_hash;
+        //ctx.accounts.escrow_state.program_hash = program_hash;
         //let inputs: &[u64] = &[1, 1];
         //ctx.accounts.escrow_state.public_inputs = public_inputs;
         ctx.accounts.escrow_state.computerequest = computerequest;
