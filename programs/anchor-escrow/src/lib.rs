@@ -23,7 +23,7 @@ pub mod anchor_escrow {
         initializer_amount: u64,
         taker_amount: u64,
         program_hash: String,
-        public_inputs: Box<[u64]>,
+        public_inputs: String,
     ) -> Result<()> {
         ctx.accounts.escrow_state.initializer_key = *ctx.accounts.initializer.key;
         ctx.accounts.escrow_state.initializer_deposit_token_account = *ctx
@@ -82,7 +82,7 @@ pub mod anchor_escrow {
         Ok(())
     }
 
-    pub fn exchange(ctx: Context<Exchange>, proof_account: Pubkey, outputs_stack: Box<[u64]>, outputs_oflow: Box<[u64]>) -> Result<()> {
+    pub fn exchange(ctx: Context<Exchange>, proof_account: Pubkey, outputs_stack: String) -> Result<()> {
         let (_vault_authority, vault_authority_bump) =
             Pubkey::find_program_address(&[AUTHORITY_SEED], ctx.program_id);
         let authority_seeds = &[&AUTHORITY_SEED[..], &[vault_authority_bump]];
@@ -91,8 +91,8 @@ pub mod anchor_escrow {
         //ctx.accounts.escrow_state.outputs = outputs_account;
         ctx.accounts.escrow_state.proof_account = proof_account;
 
-        let outputs: Box<[u64]> = outputs_stack;
-        ctx.accounts.escrow_state.outputs = outputs;
+        //let outputs: Box<[u64]> = outputs_stack;
+        //ctx.accounts.escrow_state.outputs = outputs;
         // tokens are optimistically transferred on submitting proofs.
         // A delay period or other dispute resolution mechanism may be added at this stage.
         token::transfer(
@@ -217,8 +217,9 @@ pub struct EscrowState {
     pub initializer_amount: u64,
     pub taker_amount: u64,
     pub program_hash: String,
-    pub public_inputs: Box<[u64]>,
-    pub outputs: Box<[u64]>,
+    pub public_inputs: String,
+    //pub public_inputs: Box<[u64]>,
+    //pub outputs: Box<[u64]>,
     pub proof_account: Pubkey,
 }
 

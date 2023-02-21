@@ -1,9 +1,10 @@
-# Zilch Example Computational Escrow Program
+# Zilch Example ZK-STARK ledger Program
 
 This program keeps track of computational requests, and proofs submitted on the Zilch ZK-rollup system. It is also responsible for issuing rewards to Providers that submit correct proofs and outputs for the requested computation.
 
 The Zilch-escrow contract is deployed on devnet:
-3LLSGFJHcYJA4mawtw9zW3N1tfzSMPYHycJi984SEJ7T
+Program Id: 42E6CXWWv9nRj52y6fVEtzDvTQGg7BTHK45DAQvCNW2f
+
 
 
 

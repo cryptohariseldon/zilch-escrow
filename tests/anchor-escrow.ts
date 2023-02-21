@@ -8,15 +8,13 @@ import { assert } from "chai";
 describe("anchor-escrow", () => {
   // Use Mainnet-fork for testing
   const commitment: Commitment = "confirmed";
-  const connection = new Connection("https://rpc-mainnet-fork.epochs.studio", {
-    commitment,
-    wsEndpoint: "wss://rpc-mainnet-fork.epochs.studio/ws",
-  });
+  const connection = new Connection("https://api.devnet.solana.com", commitment);
   const options = anchor.AnchorProvider.defaultOptions();
   const wallet = NodeWallet.local();
   const provider = new anchor.AnchorProvider(connection, wallet, options);
-
-  anchor.setProvider(provider);
+  //const provider = anchor.Provider.local("http://127.0.0.1:8899");
+  anchor.setProvider(provider)
+  //anchor.setProvider(provider);
 
   // CAUTTION: if you are intended to use the program that is deployed by yourself,
   // please make sure that the programIDs are consistent
