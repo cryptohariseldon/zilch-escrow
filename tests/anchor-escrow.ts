@@ -8,10 +8,9 @@ import { assert } from "chai";
 describe("anchor-escrow", () => {
   // Use Mainnet-fork for testing
   const commitment: Commitment = "confirmed";
-  const connection = new Connection("https://rpc-mainnet-fork.epochs.studio", {
-    commitment,
-    wsEndpoint: "wss://rpc-mainnet-fork.epochs.studio/ws",
-  });
+  const connection = new Connection("http://127.0.0.1:8899",
+    commitment)
+
   const options = anchor.AnchorProvider.defaultOptions();
   const wallet = NodeWallet.local();
   const provider = new anchor.AnchorProvider(connection, wallet, options);
@@ -20,7 +19,7 @@ describe("anchor-escrow", () => {
 
   // CAUTTION: if you are intended to use the program that is deployed by yourself,
   // please make sure that the programIDs are consistent
-  const programId = new PublicKey("GW65RiuuG2zU27S39FW83Yug1t13RxWWwHSCWRwSaybC");
+  const programId = new PublicKey("4c4GzBDbxj8xF63DrNAJurNChuXMTBdTkrni7APYGTnQ");
   const program = new anchor.Program(IDL, programId, provider);
 
   let mintA = null as PublicKey;
