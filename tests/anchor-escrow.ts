@@ -123,9 +123,10 @@ describe("anchor-escrow", () => {
     const inputs = "[1,1]";
     const computeRequest = new anchor.web3.Account();
     const data = {
-      public_inputs: [1, 1],
-      program_hash: "c8653f31a1098e1b83c5d4972ec544cac00aa784bba18b5a9db7478977d38e68",
+      public_inputs: "42E6CXWWv9nRj52y6fVEtzDvTQGg7BTHK45DAQvCNW2f",
+      program_hash: "42E6CXWWv9nRj52y6fVEtzDvTQGg7BTHK45DAQvCNW2f",
     };
+    const data2 = ["42E6CXWWv9nRj52y6fVEtzDvTQGg7BTHK45DAQvCNW2f", "42E6CXWWv9nRj52y6fVEtzDvTQGg7BTHK45DAQvCNW2f"];
     const encoded = anchor.utils.bytes.utf8.encode(JSON.stringify(data));
     computeRequest.data = Buffer.from(encoded);
     const ComputeRequest = {
@@ -136,7 +137,7 @@ describe("anchor-escrow", () => {
     console.log(initializer.publicKey);
     const initializerKeypair = anchor.web3.Keypair.fromSecretKey(initializer.secretKey);
     await program.methods
-      .initialize(randomSeed, new anchor.BN(initializerAmount), new anchor.BN(takerAmount), ComputeRequest)
+      .initialize(randomSeed, new anchor.BN(initializerAmount), new anchor.BN(takerAmount))
       .accounts({
         initializer: initializer.publicKey,
         vault: vaultKey,
